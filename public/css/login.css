@@ -1,0 +1,34 @@
+.login-box {
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    max-width: 1000px;
+    height: 450px;
+    width: 100%;
+}
+
+.left-box {
+    flex: 2;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 20px;
+}
+
+.left-box img {
+    max-width: 100%;
+    height: 400px;
+}
+
+.right-box {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 20px;
+}
+
+
