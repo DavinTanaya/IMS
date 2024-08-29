@@ -20,10 +20,12 @@
         </style>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
+        <title>Admin Dashboard</title>
     @endsection
-    <div class="p-1">
-        <div class="dark:bg-gray-800 sm:rounded-lg">
-            <div class="grid-container gap-3">
+
+    <div class="p-1 flex flex-col flex-1">
+        <div class="dark:bg-gray-800 sm:rounded-lg flex flex-col flex-1">
+            <div class="grid-container gap-3 flex-1">
                 <div class="bg-white px-4 py-4 min-h-full rounded-lg overflow-hidden position-relative">
                     <h1 class="title1 mb- text-xl fw-bold text-left">Product</h1>
                     <p class="text mb-4 text-gray-500 text-sm text-left border-bottom pb-3">
@@ -31,27 +33,31 @@
                     </p>
                 
                     <div class="position-absolute top-5 end-5 p-3">
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">
                             Add Product +
                         </a>
                     </div>                    
                     <div class="flex flex-col gap-2 mt-3 overflow-auto max-h-[70%]">
                         @foreach ($products as $product)
-                                <div class="flex gap-3 bg-white rounded-lg p-3 transform transition-all -translate-y-2 shadow-xl">
+                            <div class="flex gap-3 bg-white rounded-lg p-3 transform transition-all -translate-y-1 shadow-xl hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer">
+                                <a href="{{ route('admin.dashboard', ['id'=>$product->id]) }}">
                                     <img src="{{ asset('storage/'.$product->image) }}" alt="" class="img-fluid h-16 aspect-square object-cover rounded-md">
-                                    <div class="d-flex flex-column flex-grow-1">
-                                        <a href="{{ route('dashboard', ['id'=>$product->id]) }}">
-                                            <h3 class="text-lg font-bold text-left">{{ $product->name }}</h3>
-                                            <p class="text-gray-600 text-left text-break">Stock: {{ $product->stock }}</p>    
-                                        </a>
-                                    </div>
-                                    <p class="text-gray-600 text-lg mt-4">Rp. {{ $product->price }}</p>
-                                    <div class="d-flex align-items-center p-1 rounded-sm ml-3 mb-0 w-6 aspect-square justify-content-center hover:bg-bg duration-200 transition-all cursor-pointer bg-accent text-white">
-                                        <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data-delete-route="{{ route('deleteProduct', ['id' => $product->id]) }}" data-product-name="{{ $product->name }}" data-product-stock="{{ $product->stock }}" data-product-price="{{ $product->price }}" data-product-image="{{ asset('storage/' . $product->image) }}">                                            >
-                                            <span class="material-icons text-red-500">delete</span>
-                                        </button>
-                                    </div>
+                                </a>
+                                <div class="d-flex flex-column flex-grow-1">
+                                    <a href="{{ route('admin.dashboard', ['id'=>$product->id]) }}">
+                                        <h3 class="text-lg font-bold text-left">{{ $product->name }}</h3>
+                                        <p class="text-gray-600 text-left text-break">Stock: {{ $product->stock }}</p>    
+                                    </a>
                                 </div>
+                                <a href="{{ route('admin.dashboard', ['id'=>$product->id]) }}">
+                                    <p class="text-gray-600 text-lg mt-4">Rp. {{ $product->formatted_price }},00</p>
+                                </a>
+                                <div class="d-flex align-items-center p-1 rounded-sm ml-3 mb-0 w-6 aspect-square justify-content-center hover:bg-bg duration-200 transition-all cursor-pointer bg-accent text-white">
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data-delete-route="{{ route('deleteProduct', ['id' => $product->id]) }}" data-product-name="{{ $product->name }}" data-product-stock="{{ $product->stock }}" data-product-price="{{ $product->price }}" data-product-image="{{ asset('storage/' . $product->image) }}">
+                                        <span class="material-icons text-red-500 mt-3">delete</span>
+                                    </button>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -64,6 +70,7 @@
                             <div class="flex flex-col gap-2 mt-3 overflow-auto max-h-[50vh]">
                                 <form action="{{ route('editProduct', ['id'=>$productForm->id]) }}" method="POST" enctype="multipart/form-data" class="mt-0 space-y-6">
                                     @csrf
+                                    @method('PATCH')
                                     <div class="hover:bg-slate-300 duration-200 transition-all cursor-pointer group bg-slate-200 w-48 aspect-square rounded-xl relative flex items-center justify-center flex-col overflow-hidden">
                                         <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="imageInputEdit" name="image">
                                         <img id="previewImages" class="w-full h-full object-cover hidden" alt="Image preview">
@@ -96,7 +103,7 @@
                                         <x-input-error class="mt-2" :messages="$errors->get('categoryId')" />
                                     </div>
                                     <div class="flex items-center justify-end mt-4">
-                                        <button type="submit" class="btn btn-primary">Create Product</button>
+                                        <button type="submit" class="btn btn-primary">Edit Product</button>
                                     </div>
                                 </form>
                             </div>
@@ -205,7 +212,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form action="{{ route('dashboard') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.dashboard') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Confirm</button>
