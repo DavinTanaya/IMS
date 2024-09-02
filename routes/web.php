@@ -10,17 +10,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::middleware('auth')->group(function () {
     Route::get('/dashboard',[DashboardController::Class, 'getDashboard'])->name('dashboard');
     Route::post('/cart/{id}', [CartController::class, 'storeCart'])->name('storeCart');
     Route::post('/order', [OrderController::class, 'storeOrder'])->name('storeOrder');
@@ -28,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{id}', [CartController::class, 'deleteCart'])->name('deleteCart');
     Route::get('/invoice/{token}', [OrderController::class, 'getInvoice'])->name('invoice');
     Route::get('/download/{token}', [PdfController::class, 'generatePdf'])->name('download.invoice');
+    Route::get('{any}', [DashboardController::class, 'fallback'])->name('fallback');
 });
 
 Route::prefix('admin')->middleware(['auth', isAdmin::class])->group(function () {
