@@ -13,7 +13,10 @@ class Order extends Model
         'userId',
         'total_price',
         'address',
+        'provinceId',
+        'cityId',
         'zip_code',
+        'token',
     ];
 
     public function user()
@@ -24,5 +27,15 @@ class Order extends Model
     public function order_products()
     {
         return $this->hasMany(Order_Products::class, 'orderId');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'provinceId');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'cityId');
     }
 }

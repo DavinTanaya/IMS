@@ -32,9 +32,9 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required | min:3 | max:40 | string',
-            'email' => 'required | regex:/(.*)@gmail\.com/ | string | max:255 | unique:'.User::class,
+            'email' => 'required | regex:/(.*)@gmail\.com/ | string | max:255 | unique:users,email',
             'password' => ['required', 'min:6' , 'max:12' , 'string', 'confirmed', Rules\Password::defaults()],
-            'phone_number' => 'required | regex:/^08/ | unique:'.User::class ,
+            'phone_number' => 'required | regex:/^08/ | unique:users,phone_number',
         ]);
 
         $user = User::create([

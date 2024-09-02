@@ -16,23 +16,7 @@
                 font-size: 2rem;
                 font-weight: 600;
             }
-
-            .btn-edit {
-                display: none; /* Hide initially */
-                position: absolute;
-                top: 50%; /* Center vertically */
-                right: 40%; /* Adjust distance from the right edge */
-                transform: translateY(-50%); /* Center vertically by adjusting the position */
-                background-color: rgba(128, 128, 128, 0.606); /* Optional: for better visibility */
-                border-radius: 50%; /* Optional: to make it circular */
-                padding: 10px; /* Adjust size */
-            }
-
-            .cart-card:hover .btn-edit {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+            
         </style>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
@@ -50,7 +34,7 @@
                         @endphp
 
                         @foreach ($orders as $order)
-                            <div class="flex gap-3 bg-white shadow-md rounded-lg p-3 mb-1 transform transition-all hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer">
+                            <a href="{{ route('invoice', ['token' => $order->token]) }}" class="flex gap-3 bg-white shadow-md rounded-lg p-3 mb-1 transform transition-all hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer">
                                 <h3 class="text-lg font-bold">{{ $counter }}. </h3>
                                 <div class="flex flex-col">
                                     <h3 class="text-lg font-bold">#INV{{ $order->id + 1000 }}</h3>
@@ -59,7 +43,7 @@
                                 @php
                                     $counter++;
                                 @endphp
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -67,6 +51,20 @@
                     <h1 class="title1 mb- text-xl fw-bold text-left">Product</h1>
                     <p class="text mb-4 text-gray-500 text-sm text-left border-bottom pb-3">Lists of products that have been added to our inventory</p>
                     <div class="d-flex flex-column gap-2 mt-3 overflow-auto max-h-[70%]">
+                        <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="category-select" name="category">
+                            <option value="{{ route('dashboard') }}">Select Category</option>
+                            @foreach ($categories as $category)
+                                @if($categoryFilter)
+                                    <option value="{{ route('dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
+                                        {{ $category->name }}
+                                    </option>
+                                @else
+                                    <option value="{{ route('dashboard', ['category' => $category->name]) }}">
+                                        {{ $category->name }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
                         @foreach ($products as $product)
                             <div class="relative">
                                 @if ($product->stock == 0)
@@ -79,7 +77,7 @@
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center gap-3">
-                                            <p class="text-gray-600 text-lg mb-0">Rp. {{ $product->formatted_price }},00</p>
+                                            <p class="text-gray-600 text-lg mb-0">Rp. {{ number_format($product->price, 0, ',', '.') }},00</p>
                                             <div class="d-flex align-items-center p-1 rounded-sm w-6 aspect-square justify-content-center bg-accent text-white">
                                                 <button type="button" disabled>
                                                     <span class="material-icons text-blue-500">
@@ -102,7 +100,7 @@
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center gap-3">
-                                            <p class="text-gray-600 text-lg mb-0">Rp. {{ $product->formatted_price }},00</p>
+                                            <p class="text-gray-600 text-lg mb-0">Rp. {{ number_format($product->price, 0, ',', '.') }},00</p>
                                             <div class="d-flex align-items-center p-1 rounded-sm w-6 aspect-square justify-content-center hover:bg-bg duration-200 transition-all cursor-pointer bg-accent text-white">
                                                 <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data-product-image="{{ asset('storage/'.$product->image) }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-stock="{{ $product->stock }}" data-store-route="{{ route('storeCart', ['id' => $product->id]) }}">
                                                     <span class="material-icons text-blue-500">
@@ -127,18 +125,19 @@
                                 <p class="text-lg text-gray-600">No items in cart</p>
                             </div>
                         @else
-                            <div class="flex flex-col gap-2 mt-3 overflow-auto cart-card relative" style="max-height: 300px;">
+                            <div class="flex flex-col gap-2 mt-1 overflow-auto cart-card relative" style="max-height: 300px;">
                                 @foreach ($carts as $cart)
-                                    <button class="flex gap-3 bg-white rounded-lg p-3 transform transition-all -translate-y-1 shadow-md hover:-translate-y-2 duration-300 hover:shadow-xl hover:bg-gray-500 cursor-pointer" type="button" data-bs-toggle="modal" data-bs-target="#modalUpdateCart" data-cart-quantity="{{$cart->quantity}}" data-product-image="{{ asset('storage/'.$cart->product->image) }}" data-product-id="{{ $cart->product->id }}" data-product-name="{{ $cart->product->name }}" data-product-stock="{{ $cart->product->stock }}" data-update-route="{{ route('updateCart', ['id' => $cart->id]) }}" data-delete-route="{{ route('deleteCart', ['id' => $cart->id]) }}" >
-                                        <img src="{{ asset('storage/'.$cart->product->image) }}" alt="" class="img-fluid h-16 aspect-square object-cover rounded-md">
-                                        <h3 class="text-lg justify-self-end self-center font-bold text-left">{{ $cart->product->name }}</h3>
-                                        <p class="text-gray-600 justify-self-end self-center text-lg">{{ $cart->quantity }}</p>
-                                    </button>
-                                    <button class="btn-edit">
+                                <button class="relative flex gap-3 mt-2 bg-white rounded-lg p-3 transform transition-all -translate-y-1 shadow-md hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer" type="button" data-bs-toggle="modal" data-bs-target="#modalUpdateCart" data-cart-quantity="{{$cart->quantity}}" data-product-image="{{ asset('storage/'.$cart->product->image) }}" data-product-id="{{ $cart->product->id }}" data-product-name="{{ $cart->product->name }}" data-product-stock="{{ $cart->product->stock }}" data-update-route="{{ route('updateCart', ['id' => $cart->id]) }}" data-delete-route="{{ route('deleteCart', ['id' => $cart->id]) }}">
+                                    <img src="{{ asset('storage/'.$cart->product->image) }}" alt="" class="img-fluid h-16 aspect-square object-cover rounded-md">
+                                    <h3 class="text-lg justify-self-end self-center font-bold text-left">{{ $cart->product->name }}</h3>
+                                    <p class="text-gray-600 justify-self-end self-center text-lg">{{ $cart->quantity }}</p>
+                                    <div class="edit-icon opacity-0 absolute inset-0 m-auto self-center justify-center flex items-center hover:bg-gray-500/65 hover:opacity-65 hover:rounded-lg min-w-full min-h-full">
                                         <span class="material-icons text-blue-500">
                                             edit
                                         </span>
-                                    </button>
+                                    </div>
+                                </button>
+                                
                                 @endforeach
                             </div>
                         @endif
@@ -190,11 +189,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <form action="" method="POST" enctype="multipart/form-data" id="modalDeleteForm">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
-                    </form>
+                    <button type="button" id="modalDeleteButton" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmationModal">Delete</button>
                     <button type="submit" form="modalUpdateForm" class="btn btn-primary">Update</button>
                 </div>
             </div>
@@ -255,7 +250,7 @@
                                     <p class="text-gray-600 text-lg">{{ $cart->quantity }}</p>
                                 </div>
                                 <div class="flex items-center">
-                                    <h4 class="text-lg text-right text-gray-600">Rp. {{ $cart->formatted_total }},00</h4>
+                                    <h4 class="text-lg text-right text-gray-600">Rp. {{ number_format($cart->total, 0, ',', '.') }},00</h4>
                                 </div>
                             </div>
                         @endforeach
@@ -269,6 +264,26 @@
                         <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" :value="old('address')" required placeholder="Jl. Laravel No 25"/>
                         <x-input-error class="mt-2" :messages="$errors->get('address')" />
                     </div>
+                    <div class="my-3">
+                        <x-input-label for="province-select" :value="__('Province')" />
+                        <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="province-select" name="province">
+                            <option value="" disabled>Select Province</option>
+                            @foreach ($provinces as $province)
+                                <option value="{{ $province->provinceId }}">{{ $province->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error class="mt-2" :messages="$errors->get('province')" />
+                    </div>
+                    <div class="my-3">
+                        <x-input-label for="city-select" :value="__('City')" />
+                        <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="city-select" name="city" disabled>
+                            <option value="">Select City</option>
+                            @foreach ($cities as $city)
+                                <option value="{{ $city->cityId }}" data-province-id="{{ $city->provinceId }}">{{ $city->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error class="mt-2" :messages="$errors->get('city')" />
+                    </div>
                     <div>
                         <x-input-label for="zip_code" :value="__('Zip Code')" />
                         <x-text-input id="zip_code" name="zip_code" type="number" class="mt-1 block w-full" :value="old('zip_code')" required placeholder="14350"/>
@@ -281,6 +296,28 @@
                 </div>
             </form>
         </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-red-600 fw-bold">Remove Items</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure want to remove items from cart?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="" method="POST" enctype="multipart/form-data" id="modalDeleteForm" >
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Confirm</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -348,28 +385,35 @@
                 var deleteRoute = button.getAttribute('data-delete-route');
                 var cartQuantity = button.getAttribute('data-cart-quantity');
 
-                console.log('Product Name:', productName);
-                console.log('Product Stock:', productStock);
-                console.log('Product Image:', productImage);
-                console.log('Update Route:', updateRoute);
-                console.log('Delete Route:', deleteRoute);
-                console.log('Cart Quantity:', cartQuantity);
-
                 var modalImage = myModal.querySelector('.modal-body img');
                 var modalBody = myModal.querySelector('.modal-body');
                 var modalUpdateForm = myModal.querySelector('#modalUpdateForm');
-                var modalDeleteForm = myModal.querySelector('#modalDeleteForm');
+                var modalDeleteButton = myModal.querySelector('#modalDeleteButton');
                 var modalXinput = myModal.querySelector('input[name="quantity"]');
 
                 modalImage.src = productImage;
                 modalBody.querySelector('h3').textContent = productName;
                 modalBody.querySelector('p').textContent = 'Stock: ' + productStock;
                 modalUpdateForm.action = updateRoute;
-                modalDeleteForm.action = deleteRoute;
+                modalDeleteButton.setAttribute('data-delete-route', deleteRoute);
                 modalXinput.setAttribute('max', productStock);
                 modalXinput.value = cartQuantity;
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var myModal = document.getElementById('confirmationModal');
+
+            myModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var deleteRoute = button.getAttribute('data-delete-route');
+                
+                var modalDeleteForm = myModal.querySelector('#modalDeleteForm');
+                modalDeleteForm.action = deleteRoute;
+            });
+        });
+
+
 
         document.addEventListener('DOMContentLoaded', function() {
             @if (session('message'))
@@ -399,6 +443,70 @@
                     toast.show();
                 });
             @endif
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var editIconContainer = document.querySelectorAll('.edit-icon');
+            editIconContainer.forEach(function (icon) {
+                var editIcon = icon.querySelector('.material-icons');
+
+                icon.addEventListener('mouseover', function () {
+                    icon.classList.remove('opacity-0');
+                    icon.classList.add('opacity-100');
+                    editIcon.classList.add('rounded-circle', 'bg-white', 'p-2');
+                });
+
+                icon.addEventListener('mouseout', function () {
+                    icon.classList.remove('opacity-100');
+                    icon.classList.add('opacity-0');
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmationModal = document.getElementById('confirmationModal');
+
+            const modal = new bootstrap.Modal(confirmationModal);
+
+            confirmationModal.addEventListener('hidden.bs.modal', function () {
+                location.reload();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var provinceSelect = document.getElementById('province-select');
+            var citySelect = document.getElementById('city-select');
+            
+            var allCityOptions = Array.from(citySelect.options);
+
+            provinceSelect.addEventListener('change', function() {
+                var selectedProvinceId = this.value;
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                if (selectedProvinceId) {
+                    citySelect.disabled = false;
+                    
+                    allCityOptions.forEach(function(option) {
+                        if (option.dataset.provinceId === selectedProvinceId) {
+                            citySelect.add(option.cloneNode(true));
+                        }
+                    });
+                } else {
+                    citySelect.disabled = true;
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var categorySelect = document.getElementById('category-select');
+            
+            categorySelect.addEventListener('change', function() {
+                var selectedValue = this.value;
+                if (selectedValue) {
+                    window.location.href = selectedValue;
+                }
+            });
         });
     </script>
 </x-app-layout>

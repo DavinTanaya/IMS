@@ -9,13 +9,33 @@ class CategoryController extends Controller
 {
     public function storeCategory(Request $request){
         $request->validate([
-            'name' => ['required', 'string', 'max:80', 'min:5'],
+            'categoryName' => ['required', 'string', 'max:80', 'min:5'],
         ]);
 
         $category = Category::create([
-            'name' => $request->name,
+            'name' => $request->categoryName,
         ]);
 
-        return redirect('/dashboard')->with('message', 'Category created successfully');
+        return redirect()->back()->with('message', 'Category created successfully');
+    }
+
+    public function deleteCategory(Request $request){
+        $categoriesToDelete = $request->categories;
+        $message = 'Category deleted successfully';
+        foreach($categoriesToDelete as $category){
+            $category = Category::find($category);
+            if(!$category){
+                return redirect()->route('admin.dashboard')->with('error', 'Category not found');
+            }
+            if($category->products->count() > 0){
+                $category->is_active = 0;
+                $category->save();
+                $message = 'One or More Category only hidden, because it is related to products';
+            }
+            else{
+                $category->delete();
+            }
+        }
+        return redirect()->back()->with('message', $message);
     }
 }

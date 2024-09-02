@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('userId')->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('address');
-            $table->integer('total_price');
+            $table->foreignId('cityId')->references('id')->on('cities')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('provinceId')->references('id')->on('provinces')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('zip_code');
+            $table->integer('total_price');
+            $table->string('token')->nullable();
             $table->timestamps();
         });
     }
