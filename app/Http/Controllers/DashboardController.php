@@ -16,7 +16,7 @@ class DashboardController extends Controller
 {
     public function getDashboard()
     {
-        $categories = Category::where('is_active', 1)->get();
+        $categories = Category::all();
         $products = Product::where('is_hidden', 0)->get();
         $carts = Cart::where('userId', auth()->id())->with('product')->get();
         $orders = Order::where('userId', auth()->id())->get();
@@ -49,7 +49,7 @@ class DashboardController extends Controller
 
     public function getAdminDashboard() 
     {
-        $categories = Category::where('is_active', 1)->get();
+        $categories = Category::all();
         $products = Product::where('is_hidden', 0)->get();
         if(request()->query('id')){
             $product = Product::find(request()->query('id'));

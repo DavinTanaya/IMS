@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order_Products;
+use Storage;
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\Order_Products;
 use Illuminate\Support\Facades\Auth;
-use Storage;
 
 class ProductController extends Controller
 {
@@ -44,6 +45,9 @@ class ProductController extends Controller
             if(Order_Products::where('productId', $product->id)->first()){
                 $product->is_hidden = 1;
                 $product->save();
+                if(Cart::where('productId', $product->id)){
+                    Cart::where('productId', $product->id)->delete();
+                }
                 return redirect()->back()->with('error', 'Product only hidden, because it is still in the order');
             }
             if(Product::where('image', $product->image)->count() == 1){

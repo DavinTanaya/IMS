@@ -54,14 +54,16 @@
                         <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="category-select" name="category">
                             <option value="{{ route('dashboard') }}">Select Category</option>
                             @foreach ($categories as $category)
-                                @if($categoryFilter)
-                                    <option value="{{ route('dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
-                                        {{ $category->name }}
-                                    </option>
-                                @else
-                                    <option value="{{ route('dashboard', ['category' => $category->name]) }}">
-                                        {{ $category->name }}
-                                    </option>
+                                @if($category->products->where('is_hidden', false)->count() > 0 || $category->is_active)
+                                    @if($categoryFilter)
+                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @else
+                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}">
+                                            {{ $category->name }}
+                                        </option>
+                                    @endif
                                 @endif
                             @endforeach
                         </select>
@@ -267,7 +269,7 @@
                     <div class="my-3">
                         <x-input-label for="province-select" :value="__('Province')" />
                         <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="province-select" name="province">
-                            <option value="" disabled>Select Province</option>
+                            <option value="" selected disabled>Select Province</option>
                             @foreach ($provinces as $province)
                                 <option value="{{ $province->provinceId }}">{{ $province->name }}</option>
                             @endforeach
@@ -277,7 +279,7 @@
                     <div class="my-3">
                         <x-input-label for="city-select" :value="__('City')" />
                         <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="city-select" name="city" disabled>
-                            <option value="">Select City</option>
+                            <option value="" selected disabled>Select City</option>
                             @foreach ($cities as $city)
                                 <option value="{{ $city->cityId }}" data-province-id="{{ $city->provinceId }}">{{ $city->name }}</option>
                             @endforeach

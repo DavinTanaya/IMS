@@ -41,14 +41,16 @@
                         <select class="form-select form-select-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" id="category-select" name="category">
                             <option value="{{ route('admin.dashboard') }}">Select Category</option>
                             @foreach ($categories as $category)
-                                @if($categoryFilter)
-                                    <option value="{{ route('admin.dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
-                                        {{ $category->name }}
-                                    </option>
-                                @else
-                                    <option value="{{ route('admin.dashboard', ['category' => $category->name]) }}">
-                                        {{ $category->name }}
-                                    </option>
+                                @if($category->products->where('is_hidden', false)->count() > 0 || $category->is_active)
+                                    @if($categoryFilter)
+                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @else
+                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}">
+                                            {{ $category->name }}
+                                        </option>
+                                    @endif
                                 @endif
                             @endforeach
                         </select>
@@ -229,7 +231,9 @@
                                         <select class="form-select form-select-md mb-3 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" aria-label=".form-select-lg example" id="category" name="categoryId">
                                             <option value="" selected disabled>Select Category</option>
                                             @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                @if ($category->is_active)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                @endif
                                             @endforeach
                                             <option value="create" class="btn btn-primary">Create Category</option>
                                             <option value="remove" class="btn btn-danger">Remove Category</option>
@@ -276,12 +280,14 @@
                     <div class="modal-body">
                         <div class="flex flex-col gap-2 overflow-auto max-h-[10vh]">
                             @foreach ($categories as $category)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="flexCheckCategory{{ $category->id }}">
-                                    <label class="form-check-label user-select-none" for="flexCheckCategory{{ $category->id }}">
-                                        {{ $category->name }}
-                                    </label>
-                                </div>
+                                @if($category->is_active)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="flexCheckCategory{{ $category->id }}">
+                                        <label class="form-check-label user-select-none" for="flexCheckCategory{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </label>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                     </div>
