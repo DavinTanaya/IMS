@@ -129,7 +129,7 @@
                         @else
                             <div class="flex flex-col gap-2 mt-1 overflow-auto cart-card relative" style="max-height: 300px;">
                                 @foreach ($carts as $cart)
-                                <button class="relative flex gap-3 mt-2 bg-white rounded-lg p-3 transform transition-all -translate-y-1 shadow-md hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer" type="button" data-bs-toggle="modal" data-bs-target="#modalUpdateCart" data-cart-quantity="{{$cart->quantity}}" data-product-image="{{ asset('storage/'.$cart->product->image) }}" data-product-id="{{ $cart->product->id }}" data-product-name="{{ $cart->product->name }}" data-product-stock="{{ $cart->product->stock }}" data-update-route="{{ route('updateCart', ['id' => $cart->id]) }}" data-delete-route="{{ route('deleteCart', ['id' => $cart->id]) }}">
+                                <button class="relative flex gap-3 mt-2 bg-white rounded-lg p-3 transform transition-all -translate-y-1 shadow-md hover:-translate-y-2 duration-300 hover:shadow-xl cursor-pointer" type="button" data-bs-toggle="modal" data-bs-target="#modalUpdateCart" data-cart-quantity="{{$cart->quantity}}" data-cart-max="{{ $cart->quantity + $product->stock}}" data-product-image="{{ asset('storage/'.$cart->product->image) }}" data-product-id="{{ $cart->product->id }}" data-product-name="{{ $cart->product->name }}" data-product-stock="{{ $cart->product->stock }}" data-update-route="{{ route('updateCart', ['id' => $cart->id]) }}" data-delete-route="{{ route('deleteCart', ['id' => $cart->id]) }}">
                                     <img src="{{ asset('storage/'.$cart->product->image) }}" alt="" class="img-fluid h-16 aspect-square object-cover rounded-md">
                                     <h3 class="text-lg justify-self-end self-center font-bold text-left">{{ $cart->product->name }}</h3>
                                     <p class="text-gray-600 justify-self-end self-center text-lg">{{ $cart->quantity }}</p>
@@ -386,6 +386,7 @@
                 var updateRoute = button.getAttribute('data-update-route');
                 var deleteRoute = button.getAttribute('data-delete-route');
                 var cartQuantity = button.getAttribute('data-cart-quantity');
+                var cartMax = button.getAttribute('data-cart-max');
 
                 var modalImage = myModal.querySelector('.modal-body img');
                 var modalBody = myModal.querySelector('.modal-body');
@@ -398,7 +399,7 @@
                 modalBody.querySelector('p').textContent = 'Stock: ' + productStock;
                 modalUpdateForm.action = updateRoute;
                 modalDeleteButton.setAttribute('data-delete-route', deleteRoute);
-                modalXinput.setAttribute('max', productStock);
+                modalXinput.setAttribute('max', cartMax);
                 modalXinput.value = cartQuantity;
             });
         });

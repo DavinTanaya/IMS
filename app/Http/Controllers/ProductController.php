@@ -73,7 +73,7 @@ class ProductController extends Controller
                 'name' => ['required', 'string', 'max:80', 'min:5'],
                 'price' => ['required', 'numeric', 'min:1'],
                 'stock' => ['required', 'numeric', 'min:1'],
-                'categoryId' => ['required', 'exists:categories,id'],
+                'categoryId' => ['sometimes', 'exists:categories,id'],
             ]);
             if($request->hasFile('image')){
                 $file = $request->file('image');
@@ -83,12 +83,20 @@ class ProductController extends Controller
             else{
                 $filename = $product->image;
             }
+
+            if($request->categoryId){
+                $categoryId = $request->categoryId;
+            }
+            else{
+                $categoryId = $product->categoryId;
+            }
+
             $newProduct = Product::create([
                 'image' => $filename,
                 'name' => $request->name,
                 'price' => $request->price,
                 'stock' => $request->stock,
-                'categoryId' => $request->categoryId,
+                'categoryId' => $categoryId,
             ]);
             $product->is_hidden = true;
             $product->save();
@@ -99,8 +107,15 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:80', 'min:5'],
             'price' => ['required', 'numeric', 'min:1'],
             'stock' => ['required', 'numeric', 'min:1'],
-            'categoryId' => ['required', 'exists:categories,id'],
+            'categoryId' => ['sometimes', 'exists:categories,id'],
         ]);
+
+        if($request->categoryId){
+            $categoryId = $request->categoryId;
+        }
+        else{
+            $categoryId = $product->categoryId;
+        }
 
         if($request->hasFile('image')){
             $file = $request->file('image');
@@ -116,7 +131,7 @@ class ProductController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'stock' => $request->stock,
-            'categoryId' => $request->categoryId,
+            'categoryId' => $categoryId,
         ]);
 
         $product->save();

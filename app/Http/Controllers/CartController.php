@@ -15,10 +15,10 @@ class CartController extends Controller
         $oldCart = Cart::where('productId', $id)->where('userId', auth()->id())->first();
         $product = Product::find($id);
         if(!$product){
-            return redirect('/dashboard')->with('error', 'Product not found');
+            return redirect()->back()->with('error', 'Product not found');
         }
         if($request->quantity > $product->stock){
-            return redirect('/dashboard')->with('error', 'Stock not enough');
+            return redirect()->back()->with('error', 'Stock not enough');
         }
         if($oldCart){
             $oldCart->load('product');
@@ -27,7 +27,7 @@ class CartController extends Controller
             $oldCart->save();
             $oldCart->product->stock -= $request->quantity;
             $oldCart->product->save();
-            return redirect('/dashboard')->with('message', 'Product added to cart successfully');
+            return redirect()->back()->with('message', 'Product added to cart successfully');
         }
 
         $product->stock -= $request->quantity;
@@ -40,7 +40,7 @@ class CartController extends Controller
             'total' => $request->quantity * $product->price,
         ]);
 
-        return redirect('/dashboard')->with('message', 'Product added to cart successfully');
+        return redirect()->back()->with('message', 'Product added to cart successfully');
     }
 
     public function updateCart(Request $request, $id){
@@ -49,7 +49,10 @@ class CartController extends Controller
         ]);
         $cart = Cart::find($id);
         if(!$cart){
-            return redirect('/dashboard')->with('error', 'Cart not found');
+            return redirect()->back()->with('error', 'Cart not found');
+        }
+        if($request->quantity > $cart->quantity+$cart->product->stock){
+            return redirect()->back()->with('error', 'Stock not enough');
         }
         $cart->load('product');
         $cart->product->stock += $cart->quantity;
@@ -59,18 +62,18 @@ class CartController extends Controller
         $cart->product->save();
         $cart->save();
 
-        return redirect('/dashboard')->with('message', 'Cart updated successfully');
+        return redirect()->back()->with('message', 'Cart updated successfully');
     }
 
     public function deleteCart($id){
         $cart = Cart::find($id);
         if(!$cart){
-            return redirect('/dashboard')->with('error', 'Cart not found');
+            return redirect()->back()->with('error', 'Cart not found');
         }
         $cart->load('product');
         $cart->product->stock += $cart->quantity;
         $cart->product->save();
         $cart->delete();
-        return redirect('/dashboard')->with('message', 'Product removed from cart successfully');
+        return redirect()->back()->with('message', 'Product removed from cart successfully');
     }
 }

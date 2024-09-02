@@ -43,11 +43,11 @@
                             @foreach ($categories as $category)
                                 @if($category->products->where('is_hidden', false)->count() > 0 || $category->is_active)
                                     @if($categoryFilter)
-                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
+                                        <option value="{{ route('admin.dashboard', ['category' => $category->name]) }}" {{ $category->name == $categoryFilter->name ? 'selected disabled' : ''}}>
                                             {{ $category->name }}
                                         </option>
                                     @else
-                                        <option value="{{ route('dashboard', ['category' => $category->name]) }}">
+                                        <option value="{{ route('admin.dashboard', ['category' => $category->name]) }}">
                                             {{ $category->name }}
                                         </option>
                                     @endif
@@ -179,7 +179,9 @@
                                             <label for="category" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Category</label>
                                             <select class="form-select form-select-md mb-3 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" aria-label=".form-select-lg example" id="category" name="categoryId">
                                                 @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}" {{ $category->id == $productForm->categoryId ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                    @if($category->is_active || $category->id == $productForm->categoryId)
+                                                        <option value="{{ $category->id }}" {{ $category->id == $productForm->categoryId ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                    @endif
                                                 @endforeach
                                                 <option value="create" class="btn btn-primary">Create Category</option>
                                             </select>
