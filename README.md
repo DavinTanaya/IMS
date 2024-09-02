@@ -8,7 +8,7 @@ Step to run this project:
 - Remove ;
 - Save
 ```
-
+- `git clone https://github.com/DavinTanaya/IMS`
 - `cp .env.example .env`
 - `composer i`
 - `php artisan migrate`
