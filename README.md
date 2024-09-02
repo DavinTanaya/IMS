@@ -18,4 +18,11 @@ Step to run this project:
 - `npm i`
 - `npm run dev`
 
+```
+Seeder:
+User: davin.tanaya@gmail.com
+Password: secret
 
+Admin: admin@gmail.com
+Password: secret
+```
