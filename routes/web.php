@@ -21,7 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{id}', [CartController::class, 'deleteCart'])->name('deleteCart');
     Route::get('/invoice/{token}', [OrderController::class, 'getInvoice'])->name('invoice');
     Route::get('/download/{token}', [PdfController::class, 'generatePdf'])->name('download.invoice');
-    Route::get('{any}', [DashboardController::class, 'fallback'])->name('fallback');
+    Route::get('/', [DashboardController::class, 'fallback']);
+    Route::get('/{any}', [DashboardController::class, 'fallback']);
 });
 
 Route::prefix('admin')->middleware(['auth', isAdmin::class])->group(function () {
