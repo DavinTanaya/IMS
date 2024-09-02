@@ -1,6 +1,14 @@
 Inventory Management System
 
 Step to run this project:
+```
+- Open XAMPP
+- Open Apache -> config -> php.ini
+- Search extension=gd
+- Remove ;
+- Save
+```
+
 - `cp .env.example .env`
 - `composer i`
 - `php artisan migrate`
