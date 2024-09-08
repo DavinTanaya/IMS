@@ -12,9 +12,17 @@ class CategoryController extends Controller
             'categoryName' => ['required', 'string', 'max:80', 'min:5'],
         ]);
 
-        $category = Category::create([
-            'name' => $request->categoryName,
-        ]);
+        if(Category::where('name', $request->categoryName)->first()){
+            $cat = Category::where('name', $request->categoryName)->first();
+            $cat->is_active = 1;
+            $cat->save();
+        }
+        else{
+            $category = Category::create([
+                'name' => $request->categoryName,
+            ]);
+        }
+
 
         return redirect()->back()->with('message', 'Category created successfully');
     }
